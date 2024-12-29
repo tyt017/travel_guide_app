@@ -1,0 +1,19 @@
+@startuml
+class SceneDao {
+    + getItems(): Flow<List<Scene>>
+    + getItem(id: Int): Flow<Scene>
+    + insert(scene: Scene)
+    + update(scene: Scene)
+    + delete(scene: Scene)
+}
+
+class Scene {
+    + id: Int
+    + name: String
+    + address: String
+    + image: String
+    + description: String
+}
+
+SceneDao --> Scene: manages
+@enduml

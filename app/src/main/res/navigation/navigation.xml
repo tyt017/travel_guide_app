@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation"
+    app:startDestination="@id/myFavoriteScene">
+
+    <fragment
+        android:id="@+id/myFavoriteScene"
+        android:name="com.example.finalproject.MyFavoriteScene"
+        android:label="fragment_my_favorite_scene"
+        tools:layout="@layout/fragment_my_favorite_scene" >
+        <action
+            android:id="@+id/action_myFavoriteScene_to_addOneScene"
+            app:destination="@id/addOneScene" />
+        <action
+            android:id="@+id/action_myFavoriteScene_to_aboutTheScene"
+            app:destination="@id/aboutTheScene" />
+    </fragment>
+    <fragment
+        android:id="@+id/addOneScene"
+        android:name="com.example.finalproject.AddOneScene"
+        android:label="fragment_add_one_scene"
+        tools:layout="@layout/fragment_add_one_scene" />
+    <fragment
+        android:id="@+id/aboutTheScene"
+        android:name="com.example.finalproject.AboutTheScene"
+        android:label="fragment_about_the_scene"
+        tools:layout="@layout/fragment_about_the_scene" >
+        <argument
+            android:name="sceneId"
+            app:argType="integer" />
+        <action
+            android:id="@+id/action_aboutTheScene_to_weatherFragment"
+            app:destination="@id/weatherFragment" />
+        <action
+            android:id="@+id/action_aboutTheScene_to_mapsFragment"
+            app:destination="@id/mapsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/weatherFragment"
+        android:name="com.example.finalproject.weather.WeatherFragment"
+        android:label="WeatherFragment" >
+        <argument
+            android:name="sceneId"
+            app:argType="integer" />
+        <argument
+            android:name="sendLocation"
+            app:argType="string" />
+    </fragment>
+    <fragment
+        android:id="@+id/mapsFragment"
+        android:name="com.example.finalproject.MapsFragment"
+        android:label="fragment_maps"
+        tools:layout="@layout/fragment_maps" />
+</navigation>

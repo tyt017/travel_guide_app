@@ -10,6 +10,7 @@ class SceneViewModel(private val sceneDao: SceneDao): ViewModel() {
 
     // declare an LiveData to hold all items in the database
     val allScenes: LiveData<List<Scene>> = sceneDao.getItems().asLiveData()
+    val operationStatus = MutableLiveData<OperationStatus>()
 
     /**
      * Inserts the new Scene into database.
@@ -91,7 +92,10 @@ class SceneViewModel(private val sceneDao: SceneDao): ViewModel() {
     }
 }
 
-
+sealed class OperationStatus {
+    object SUCCESS : OperationStatus()
+    data class ERROR(val message: String) : OperationStatus()
+}
 
 
 

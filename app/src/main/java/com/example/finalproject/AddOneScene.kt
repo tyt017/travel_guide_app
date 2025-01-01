@@ -50,66 +50,19 @@ class AddOneScene : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        // Coding here
-        binding.saveAction.setOnClickListener {
-            addNewScene()
-            Toast.makeText(context,"SUCCESSFUL ADDED", Toast.LENGTH_SHORT).show()
-        }
-
-        val getImage1 =
-            registerForActivityResult(ActivityResultContracts.GetContent()) {// handle selection of one image
-
-                uri -> imagePath1 = uri// save the image's path
-                binding.imagePreview1.apply {
-                    scaleType = ImageView.ScaleType.CENTER_CROP
-                    load(uri) {
-                        size(40, 40) // in pixels
-                    }
-                }
-            }
-        binding.button1Add.setOnClickListener {
-            getImage1.launch("image/*")
-        }
-        binding.button1Delete.setOnClickListener {
-            imagePath1 = null
-            binding.imagePreview1.setImageResource(android.R.drawable.ic_menu_camera)
-            // not R.drawable
-        }
-        // 按圖片時，把圖片放大 //即便是image 也支持 setOnclick的方法
-        binding.imagePreview1.setOnClickListener {
-            binding.imageView.load(imagePath1) {
-                size(1000)
-            }
-            Toast.makeText(context, "Path=${imagePath1}", Toast.LENGTH_SHORT).show()
-
-        }
-
         // Get the ViewModel
         weatherViewModel = ViewModelProvider(this).get(WeatherViewModel::class.java)
         // configure the spinner
-        // set the data source
+//         set the data source
 
-        val adapter = ArrayAdapter(requireContext(), R.layout.simple_spinner_item, weatherViewModel.cities)
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_item)
-        binding.spinner.adapter = adapter
-        binding.spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
-            override fun onItemSelected(parent: AdapterView<*>, p1: View?, p2: Int, p3: Long) {
-                // p0 means parent here
-                val selectedPosition = parent?.selectedItemPosition
-                locationindex = if (selectedPosition != null) {
-                    selectedPosition
-                } else {
-                    0
-                }
-                /* selectedPosition.let {
-                            WeatherViewModel.sendRetrofitRequest(WeatherViewModel.cities[it!!])
-                        }*/
-            }
-            override fun onNothingSelected(p0: AdapterView<*>) {
-                TODO("Not yet implemented")
-            }
-        }
+//        binding.saveAction.setOnClickListener {
+//            addNewScene()
+//            Toast.makeText(context,"SUCCESSFUL ADDED", Toast.LENGTH_SHORT).show()
+//        }
+        setupImageSelection() // 將原本直接寫在onViewCreated中的image處理程式碼獨立出來，變成一個function
+        setupSpinner() // 將原本直接寫在onViewCreated中的spinner處理程式碼獨立出來，變成一個function
+        setupSaveAction()
+        observeViewModel()
     }
 
     private fun addNewScene() {
@@ -135,5 +88,80 @@ class AddOneScene : Fragment() {
             binding.locationDescription.text.toString(),
             weatherViewModel.cities[locationindex]
         )
+    }
+
+    private fun setupSaveAction() {
+        binding.saveAction.setOnClickListener {
+            if (isEntryValid()) {
+                viewModel.addNewScene(
+                    binding.locationName.text.toString(),//retrival
+                    binding.locationAddress.text.toString(),
+                    imagePath1.toString(),
+                    binding.locationDescription.text.toString(), //Integer to String
+                    weatherViewModel.cities[locationindex]
+                )
+                Toast.makeText(context,"SUCCESSFUL ADDED", Toast.LENGTH_SHORT).show()
+                // back to listFragment
+                findNavController().navigateUp()
+            }
+        }
+    }
+
+    private fun setupImageSelection() {
+        val getImage = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+            imagePath1 = uri
+            binding.imagePreview1.apply {
+                scaleType = ImageView.ScaleType.CENTER_CROP
+                load(uri) { size(40, 40) }
+            }
+        }
+
+        binding.button1Add.setOnClickListener {
+            getImage.launch("image/*")
+        }
+
+        binding.button1Delete.setOnClickListener {
+            imagePath1 = null
+            binding.imagePreview1.setImageResource(android.R.drawable.ic_menu_camera)
+        }
+
+        binding.imagePreview1.setOnClickListener {
+            binding.imageView.load(imagePath1) { size(1000) }
+            Toast.makeText(context, "Path=${imagePath1}", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun setupSpinner() {
+        val adapter = ArrayAdapter(
+            requireContext(),
+            android.R.layout.simple_spinner_item,
+            weatherViewModel.cities
+        )
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        binding.spinner.adapter = adapter
+
+        binding.spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
+                locationindex = position
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>) {
+                // 可以選擇加入默認邏輯或保持空
+            }
+        }
+    }
+
+    private fun observeViewModel() {
+        viewModel.operationStatus.observe(viewLifecycleOwner) { status ->
+            when (status) {
+                is OperationStatus.SUCCESS -> {
+                    Toast.makeText(context, "Success Added", Toast.LENGTH_SHORT).show()
+                    requireActivity().onBackPressed()
+                }
+                is OperationStatus.ERROR -> {
+                    Toast.makeText(context, status.message, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
     }
 }

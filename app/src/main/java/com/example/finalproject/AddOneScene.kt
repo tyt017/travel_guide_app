@@ -1,8 +1,9 @@
 package com.example.finalproject
 
-import android.R
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
+import android.view.ContextThemeWrapper
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -18,17 +19,23 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.example.finalproject.databinding.FragmentAddOneSceneBinding
 
-class AddOneScene : Fragment() {
+open class AddOneScene : Fragment() {
 
-    lateinit var binding: FragmentAddOneSceneBinding
+    private var _binding: FragmentAddOneSceneBinding? = null
+    private val binding get() = _binding!!
+//    lateinit var binding: FragmentAddOneSceneBinding
     private var imagePath1: Uri? = null
 
-    private val viewModel: SceneViewModel by activityViewModels {//在 Fragment 使用 ViewModel 的code
-        SceneViewModelFactory(
-            (activity?.application as SceneListApplication).database.sceneDao()
-        )
+    protected open fun provideSceneViewModel(): SceneViewModel {
+        return ViewModelProvider(this).get(SceneViewModel::class.java)
     }
 
+//    val viewModel: SceneViewModel by activityViewModels {//在 Fragment 使用 ViewModel 的code
+//        SceneViewModelFactory(
+//            (activity?.application as SceneListApplication).database.sceneDao()
+//        )
+//    }
+    lateinit var viewModel: SceneViewModel
     private lateinit var weatherViewModel: WeatherViewModel
 
     private var locationindex: Int = 0
@@ -44,12 +51,16 @@ class AddOneScene : Fragment() {
         // Inflate the layout for this fragment
         // return inflater.inflate(R.layout.fragment_add_one_scene, container, false)
         // By binding
-        binding = FragmentAddOneSceneBinding.inflate(inflater, container, false)
+        val contextThemeWrapper = ContextThemeWrapper(activity, R.style.Theme_FinalProject)
+        val themedInflater = inflater.cloneInContext(contextThemeWrapper)
+        _binding = FragmentAddOneSceneBinding.inflate(themedInflater, container, false)
         return binding.root
     }
 
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        viewModel = provideSceneViewModel()
         // Get the ViewModel
         weatherViewModel = ViewModelProvider(this).get(WeatherViewModel::class.java)
         // configure the spinner
@@ -59,6 +70,7 @@ class AddOneScene : Fragment() {
 //            addNewScene()
 //            Toast.makeText(context,"SUCCESSFUL ADDED", Toast.LENGTH_SHORT).show()
 //        }
+
         setupImageSelection() // 將原本直接寫在onViewCreated中的image處理程式碼獨立出來，變成一個function
         setupSpinner() // 將原本直接寫在onViewCreated中的spinner處理程式碼獨立出來，變成一個function
         setupSaveAction()
@@ -102,7 +114,7 @@ class AddOneScene : Fragment() {
                 )
                 Toast.makeText(context,"SUCCESSFUL ADDED", Toast.LENGTH_SHORT).show()
                 // back to listFragment
-                findNavController().navigateUp()
+//                findNavController().navigateUp()
             }
         }
     }
@@ -151,7 +163,7 @@ class AddOneScene : Fragment() {
         }
     }
 
-    private fun observeViewModel() {
+    fun observeViewModel() {
         viewModel.operationStatus.observe(viewLifecycleOwner) { status ->
             when (status) {
                 is OperationStatus.SUCCESS -> {

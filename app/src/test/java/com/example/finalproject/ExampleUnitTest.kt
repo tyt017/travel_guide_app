@@ -73,49 +73,4 @@ class ExampleUnitTest {
 
         assertTrue(result)
     }
-
-//    @Test
-//    fun `test getItems returns expected list`() = runTest {
-//        // Arrange
-//        val mockSceneList = listOf(
-//            Scene(1, "Scene1", "Addr1", "Image1", "Desc1", "sendLoc1"),
-//            Scene(2, "Scene2", "Addr2", "Image2", "Desc2", "sendLoc2")
-//        )
-//
-//        // 模擬 getItems 方法返回
-//        `when`(mockSceneDao.getItems()).thenReturn(flowOf(mockSceneList))
-//
-//        val viewModel = SceneViewModel(mockSceneDao)
-//
-//        // Act
-//        val result = viewModel.retrieveScene(1)
-//
-//        // Assert
-//        result.observeForever {
-//            assertEquals(mockSceneList[0], it)
-//        }
-//    }
 }
-
-//class SceneViewModelTest {
-//
-//    @Test
-//    fun testIsEntryValid() {
-//        // 模擬 SceneDao
-//        val mockSceneDao = mock(SceneDao::class.java)
-//
-//        // 傳入模擬的 SceneDao 初始化 ViewModel
-//        val viewModel = SceneViewModel(mockSceneDao)
-//
-//        // 測試 isEntryValid 方法
-//        val result = viewModel.isEntryValid(
-//            "Name",
-//            "Addr",
-//            "ImageUri",
-//            "Description",
-//            "City"
-//        )
-//
-//        assertTrue(result)
-//    }
-//}

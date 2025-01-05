@@ -6,6 +6,7 @@ import com.example.finalproject.data.Scene
 import com.example.finalproject.data.SceneDao
 import kotlinx.coroutines.launch
 
+@Mockable
 class SceneViewModel(private val sceneDao: SceneDao): ViewModel() {
 
     // declare an LiveData to hold all items in the database

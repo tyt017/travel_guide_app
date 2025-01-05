@@ -3,6 +3,7 @@ package com.example.finalproject
 import android.R
 import android.net.Uri
 import android.os.Bundle
+import android.view.ContextThemeWrapper
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -18,17 +19,23 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.example.finalproject.databinding.FragmentAddOneSceneBinding
 
-class AddOneScene : Fragment() {
+open class AddOneScene : Fragment() {
 
-    lateinit var binding: FragmentAddOneSceneBinding
+    private var _binding: FragmentAddOneSceneBinding? = null
+    private val binding get() = _binding!!
     private var imagePath1: Uri? = null
 
-    private val viewModel: SceneViewModel by activityViewModels {//在 Fragment 使用 ViewModel 的code
-        SceneViewModelFactory(
-            (activity?.application as SceneListApplication).database.sceneDao()
-        )
+    protected open fun provideSceneViewModel(): SceneViewModel {
+        // 在正式執行時，這裡使用原本的工廠或 activityViewModels 的邏輯
+        return ViewModelProvider(
+            requireActivity(),
+            SceneViewModelFactory(
+                (requireActivity().application as SceneListApplication).database.sceneDao()
+            )
+        ).get(SceneViewModel::class.java)
     }
 
+    lateinit var viewModel: SceneViewModel
     private lateinit var weatherViewModel: WeatherViewModel
 
     private var locationindex: Int = 0
@@ -44,13 +51,15 @@ class AddOneScene : Fragment() {
         // Inflate the layout for this fragment
         // return inflater.inflate(R.layout.fragment_add_one_scene, container, false)
         // By binding
-        binding = FragmentAddOneSceneBinding.inflate(inflater, container, false)
+        val contextThemeWrapper = ContextThemeWrapper(activity, com.example.finalproject.R.style.Theme_FinalProject)
+        val themedInflater = inflater.cloneInContext(contextThemeWrapper)
+        _binding = FragmentAddOneSceneBinding.inflate(themedInflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        viewModel = provideSceneViewModel()
         // Coding here
         binding.saveAction.setOnClickListener {
             addNewScene()

@@ -6,11 +6,12 @@ import com.example.finalproject.data.Scene
 import com.example.finalproject.data.SceneDao
 import kotlinx.coroutines.launch
 
+@Mockable
 class SceneViewModel(private val sceneDao: SceneDao): ViewModel() {
 
     // declare an LiveData to hold all items in the database
     val allScenes: LiveData<List<Scene>> = sceneDao.getItems().asLiveData()
-
+    val operationStatus = MutableLiveData<OperationStatus>()
     /**
      * Inserts the new Scene into database.
      */
@@ -91,9 +92,10 @@ class SceneViewModel(private val sceneDao: SceneDao): ViewModel() {
     }
 }
 
-
-
-
+sealed class OperationStatus {
+    object SUCCESS : OperationStatus()
+    data class ERROR(val message: String) : OperationStatus()
+}
 
 /**
  * Factory class to instantiate the [ViewModel] instance.
